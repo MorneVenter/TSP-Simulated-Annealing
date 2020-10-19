@@ -3,6 +3,18 @@ import numpy as np
 from matplotlib import pyplot as plt
 from os import system, name
 import random
+import enum
+#------------------------Imgage Selection--------------------------------------#
+class Images(enum.Enum):
+   Hitler = 1
+   Sam = 2
+   Riaan = 3
+
+#Set your image here!
+#   -Images.Hitler
+#   -Images.Sam
+#   -Images.Riaan
+selected_image = Images.Riaan
 
 #----------------------------Setup---------------------------------------------#
 #Plotting
@@ -19,8 +31,34 @@ color_list = [CB91_Blue, CB91_Pink, CB91_Green, CB91_Amber,
 plt.rcParams['axes.prop_cycle'] = plt.cycler(color=color_list)
 plt.rcParams['figure.facecolor'] = '#0d1a26'
 #------------------------------------------------------------------------------#
-# Variables
+#--------------------------------Images----------------------------------------#
+image_name = "hitler.jpg" #Name of image
+thresh = 145 #Threshold boundry 0-255
+ignore_chance = 0.6 #Chance a sample point will be ignored
 pixel_stride = 2 #Length of pixel sampling.
+figure_size = (4.5,8) #Figure size
+# Set Variables
+if selected_image == Images.Hitler:
+    image_name = "hitler.jpg"
+    thresh = 145
+    thresh_type = cv2.THRESH_BINARY
+    ignore_chance = 0.6
+    pixel_stride = 2
+    figure_size = (4.5,8)
+elif selected_image == Images.Sam:
+    image_name = "sam.jpg"
+    thresh = 45
+    thresh_type = cv2.THRESH_BINARY_INV
+    ignore_chance = 0.6
+    pixel_stride = 3
+    figure_size = (5,7)
+elif selected_image == Images.Riaan:
+    image_name = "riaan.jpg"
+    thresh = 140
+    thresh_type = cv2.THRESH_BINARY_INV
+    ignore_chance = 0.4
+    pixel_stride = 2
+    figure_size = (6,8)
 #------------------------------------------------------------------------------#
 def clear():
 
@@ -46,9 +84,9 @@ class Coordinate:
 #------------------------------------------------------------------------------#
 
 #----------------------------Get Image-----------------------------------------#
-img = cv2.imread('test.jpg')
+img = cv2.imread(image_name)
 grayImage = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-(thresh, blackAndWhiteImage) = cv2.threshold(grayImage, 145, 255, cv2.THRESH_BINARY)
+(thresh, blackAndWhiteImage) = cv2.threshold(grayImage, thresh, 255, thresh_type)
 
 # cv2.imshow("Image",blackAndWhiteImage)
 # cv2.waitKey(0)
@@ -59,7 +97,7 @@ all_pts = []
 for x in range(0, height, pixel_stride):
     for y in range(0, width, pixel_stride):
         r = random.random()
-        if blackAndWhiteImage[x,y] == 255 and r < 0.6:
+        if blackAndWhiteImage[x,y] == 255 and r < ignore_chance:
             all_pts.append(Coordinate(y,-x))
 
 #------------------------------------------------------------------------------#
@@ -71,7 +109,8 @@ solution.append(all_pts[current_pt])
 
 while(len(solution) != len(all_pts)):
     clear()
-    print(str(round(len(solution)/len(all_pts)*100.0, 2)),'%')
+    print("This might take a while. Please be patient.")
+    print("Progress: ",str(round(len(solution)/len(all_pts)*100.0, 2)),'%')
     for i in range(0,len(all_pts)):
         if i != current_pt:
             dist = Coordinate.get_distance(all_pts[current_pt], all_pts[i])
@@ -85,7 +124,7 @@ while(len(solution) != len(all_pts)):
 
 #------------------------------------------------------------------------------#
 #----------------------------Plotting------------------------------------------#
-fig = plt.figure(figsize=(4,8))
+fig = plt.figure(figsize=figure_size)
 ax = fig.add_subplot()
 fig.canvas.set_window_title('TSP')
 linecolor = CB91_Blue
