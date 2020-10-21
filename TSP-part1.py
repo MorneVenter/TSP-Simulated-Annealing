@@ -50,7 +50,18 @@ number_of_points = 20 #Total number of points
 fig = plt.figure(figsize=(7,7))
 ax = fig.add_subplot()
 fig.canvas.set_window_title('Annealing')
-#plt.ion()
+
+#---------------------------------Utility--------------------------------------#
+def clear():
+
+    # for windows
+    if name == 'nt':
+        _ = system('cls')
+
+    # for mac and linux(here, os.name is 'posix')
+    else:
+        _ = system('clear')
+#------------------------------------------------------------------------------#
 
 #------------------------------Methods-----------------------------------------#
 def plot_data_anim():
@@ -119,7 +130,8 @@ for i in range(number_of_points): # set total numper of points
 
 cost0 = Coordinate.get_total_distance(all_pts)
 
-for i in range(markov_chain_count): #Set
+for i in range(markov_chain_count):
+    clear()
     print(i,': Total Length = ', cost0)
     plot_data_anim()
     temp = temp*alpha
