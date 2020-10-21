@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-
+from os import system, name
 #----------------------------Setup---------------------------------------------#
 # Lets make our plots pretty, we are not hooligans.
 CB91_Blue = '#2CBDFE'
