@@ -10,6 +10,7 @@ import enum
 import time
 
 #------------------------Imgage Selection--------------------------------------#
+anim = False
 class Images(enum.Enum):
    Hitler = 1
    Sam = 2
@@ -71,8 +72,9 @@ elif selected_image == Images.Riaan:
     figure_size = (6,8)
     savepath = "Result/Riaan/"
 
-os.system('rm -rf '+ savepath)
-os.system('mkdir ' + savepath)
+if anim:
+    os.system('rm -rf '+ savepath)
+    os.system('mkdir ' + savepath)
 
 #------------------------------------------------------------------------------#
 #----------------------------Plotting------------------------------------------#
@@ -96,7 +98,7 @@ def plot_data_save():
     plt.savefig(savepath+str(round(time.time()))+".png")
 
 def plot_data_final():
-    matplotlib.use('Qt4Agg')
+    matplotlib.use('TkAgg')
     fig2 = plt.figure(figsize=figure_size)
     ax2 = fig2.add_subplot()
     fig2.canvas.set_window_title('TSP')
@@ -168,7 +170,7 @@ while(len(solution) != len(all_pts)):
     print("This might take a while. Please be patient.")
     comp = round(len(solution)/len(all_pts)*100.0,2)
     print("Progress: ",str(comp),'%')
-    if last_save < time.time():
+    if last_save < time.time() and anim:
         plot_data_save()
         last_save = time.time()+5.0
     for i in range(0,len(all_pts)):
