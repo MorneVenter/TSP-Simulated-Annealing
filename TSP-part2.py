@@ -10,7 +10,7 @@ import enum
 import time
 
 #------------------------Imgage Selection--------------------------------------#
-anim = False
+anim = False #set to true if snapshots of the process should be saved every 5 secs
 class Images(enum.Enum):
    Hitler = 1
    Sam = 2
@@ -160,8 +160,13 @@ for x in range(0, height, pixel_stride):
 #-------------------TSP Nearest Neighbour--------------------------------------#
 
 solution = []
-current_pt = 0
+current_pt = np.random.randint(0, len(all_pts))
 next_pt = np.random.randint(0, len(all_pts))
+if next_pt == current_pt:
+    if next_pt == 0:
+        next_pt = current_pt + 1
+    else:
+        next_pt = current_pt - 1
 solution.append(all_pts[current_pt])
 last_save = 0
 
