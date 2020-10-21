@@ -1,9 +1,14 @@
 import cv2
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
 from matplotlib import pyplot as plt
+import os
 from os import system, name
 import random
 import enum
+import time
+
 #------------------------Imgage Selection--------------------------------------#
 class Images(enum.Enum):
    Hitler = 1
@@ -30,6 +35,7 @@ color_list = [CB91_Blue, CB91_Pink, CB91_Green, CB91_Amber,
               CB91_Purple, CB91_Violet]
 plt.rcParams['axes.prop_cycle'] = plt.cycler(color=color_list)
 plt.rcParams['figure.facecolor'] = '#0d1a26'
+
 #------------------------------------------------------------------------------#
 #--------------------------------Images----------------------------------------#
 image_name = "hitler.jpg" #Name of image
@@ -37,29 +43,76 @@ thresh = 145 #Threshold boundry 0-255
 ignore_chance = 0.6 #Chance a sample point will be ignored
 pixel_stride = 2 #Length of pixel sampling.
 figure_size = (4.5,8) #Figure size
+savepath = "Result/Hitler/" #Save path for slideshow
+
 # Set Variables
 if selected_image == Images.Hitler:
-    image_name = "hitler.jpg"
+    image_name = "Finals/hitler.jpg"
     thresh = 145
     thresh_type = cv2.THRESH_BINARY
     ignore_chance = 0.6
     pixel_stride = 2
     figure_size = (4.5,8)
+    savepath = "Result/Hitler/"
 elif selected_image == Images.Sam:
-    image_name = "sam.jpg"
+    image_name = "Finals/sam.jpg"
     thresh = 45
     thresh_type = cv2.THRESH_BINARY_INV
     ignore_chance = 0.6
     pixel_stride = 3
     figure_size = (5,7)
+    savepath = "Result/Sam/"
 elif selected_image == Images.Riaan:
-    image_name = "riaan.jpg"
+    image_name = "Finals/riaan.jpg"
     thresh = 140
     thresh_type = cv2.THRESH_BINARY_INV
     ignore_chance = 0.4
     pixel_stride = 2
     figure_size = (6,8)
+    savepath = "Result/Riaan/"
+
+os.system('rm -rf '+ savepath)
+os.system('mkdir ' + savepath)
+
 #------------------------------------------------------------------------------#
+#----------------------------Plotting------------------------------------------#
+fig = plt.figure(figsize=figure_size)
+ax = fig.add_subplot()
+fig.canvas.set_window_title('TSP')
+
+def plot_data_save():
+
+    fig = plt.figure(figsize=figure_size)
+    ax = fig.add_subplot()
+    fig.canvas.set_window_title('TSP')
+    linecolor = CB91_Blue
+
+    for pt1, pt2 in zip(solution[:-1], solution[1:]):
+        ax.plot([pt1.x, pt2.x], [pt1.y, pt2.y], linecolor, linewidth=0.5)
+
+    plt.axis('equal')
+    ax.axis('tight')
+    ax.axis('off')
+    plt.savefig(savepath+str(round(time.time()))+".png")
+
+def plot_data_final():
+    matplotlib.use('Qt4Agg')
+    fig2 = plt.figure(figsize=figure_size)
+    ax2 = fig2.add_subplot()
+    fig2.canvas.set_window_title('TSP')
+    linecolor = CB91_Blue
+
+    for pt1, pt2 in zip(solution[:-1], solution[1:]):
+        ax2.plot([pt1.x, pt2.x], [pt1.y, pt2.y], linecolor, linewidth=0.5)
+
+    ax2.plot([all_pts[0].x,all_pts[-1].x],[all_pts[0].y,all_pts[-1].y], linecolor, linewidth=0.5)
+
+    plt.axis('equal')
+    ax2.axis('tight')
+    ax2.axis('off')
+    plt.show()
+
+#---------------------------------Utility--------------------------------------#
 def clear():
 
     # for windows
@@ -70,6 +123,7 @@ def clear():
     else:
         _ = system('clear')
 #------------------------------------------------------------------------------#
+
 #------------------------Coordinates Class-------------------------------------#
 #------------------------------------------------------------------------------#
 class Coordinate:
@@ -102,15 +156,21 @@ for x in range(0, height, pixel_stride):
 
 #------------------------------------------------------------------------------#
 #-------------------TSP Nearest Neighbour--------------------------------------#
+
 solution = []
 current_pt = 0
 next_pt = np.random.randint(0, len(all_pts))
 solution.append(all_pts[current_pt])
+last_save = 0
 
 while(len(solution) != len(all_pts)):
     clear()
     print("This might take a while. Please be patient.")
-    print("Progress: ",str(round(len(solution)/len(all_pts)*100.0, 2)),'%')
+    comp = round(len(solution)/len(all_pts)*100.0,2)
+    print("Progress: ",str(comp),'%')
+    if last_save < time.time():
+        plot_data_save()
+        last_save = time.time()+5.0
     for i in range(0,len(all_pts)):
         if i != current_pt:
             dist = Coordinate.get_distance(all_pts[current_pt], all_pts[i])
@@ -122,21 +182,7 @@ while(len(solution) != len(all_pts)):
     current_pt = next_pt
     next_pt = np.random.randint(0, len(all_pts))
 
+
 #------------------------------------------------------------------------------#
 #----------------------------Plotting------------------------------------------#
-fig = plt.figure(figsize=figure_size)
-ax = fig.add_subplot()
-fig.canvas.set_window_title('TSP')
-linecolor = CB91_Blue
-
-for pt1, pt2 in zip(solution[:-1], solution[1:]):
-    ax.plot([pt1.x, pt2.x], [pt1.y, pt2.y], linecolor, linewidth=0.5)
-#ax.plot([all_pts[0].x,all_pts[-1].x],[all_pts[0].y,all_pts[-1].y], linecolor, linewidth=0.5)
-
-# for pt in solution:
-#     ax.plot(pt.x,pt.y, marker='o', color=dotcolor, markersize=0.75)
-
-plt.axis('equal')
-ax.axis('tight')
-ax.axis('off')
-plt.show()
+plot_data_final()
