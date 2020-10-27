@@ -122,6 +122,7 @@ def start_anneal():
     global all_pts
     global markov_chain_count
     global markov_chain_length
+    global fig
     for i in range(number_of_points): # set total numper of points
         all_pts.append(Coordinate(np.random.uniform(),np.random.uniform()))
     cost0 = Coordinate.get_total_distance(all_pts)
@@ -129,6 +130,8 @@ def start_anneal():
         plot_data_anim()
         temp = temp*alpha
         for j in range(markov_chain_length):
+            if not(plt.fignum_exists(fig.number)):
+                raise SystemExit(0)
             r1, r2 = np.random.randint(0, len(all_pts), size=2)
             tmp = all_pts[r1]
             all_pts[r1] = all_pts[r2]
