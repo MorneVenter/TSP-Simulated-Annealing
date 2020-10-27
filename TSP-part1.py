@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from os import system, name
+import PySimpleGUI as sg
+
 #----------------------------Setup---------------------------------------------#
 # Lets make our plots pretty, we are not hooligans.
 CB91_Blue = '#2CBDFE'
@@ -50,6 +52,7 @@ number_of_points = 20 #Total number of points
 fig = plt.figure(figsize=(7,7))
 ax = fig.add_subplot()
 fig.canvas.set_window_title('Annealing')
+cost0 = 0
 
 #---------------------------------Utility--------------------------------------#
 def clear():
@@ -125,36 +128,66 @@ def plot_data_final():
     plt.show()
 
 #------------------------------------------------------------------------------#
-for i in range(number_of_points): # set total numper of points
-    all_pts.append(Coordinate(np.random.uniform(),np.random.uniform()))
-
-cost0 = Coordinate.get_total_distance(all_pts)
-
-for i in range(markov_chain_count):
-    clear()
-    print(i,': Total Length = ', cost0)
-    plot_data_anim()
-    temp = temp*alpha
-
-    for j in range(markov_chain_length):
-        #swap two points
-        r1, r2 = np.random.randint(0, len(all_pts), size=2)
-        tmp = all_pts[r1]
-        all_pts[r1] = all_pts[r2]
-        all_pts[r2] = tmp
-
-        cost1 = Coordinate.get_total_distance(all_pts)
-
-        if cost1 < cost0:
-            cost0 = cost1
-        else:
-            x = np.random.uniform()
-            if x < np.exp((cost0-cost1)/temp):
+def start_anneal():
+    global temp
+    global cost0
+    global alpha
+    global all_pts
+    global markov_chain_count
+    global markov_chain_length
+    for i in range(number_of_points): # set total numper of points
+        all_pts.append(Coordinate(np.random.uniform(),np.random.uniform()))
+    cost0 = Coordinate.get_total_distance(all_pts)
+    for i in range(markov_chain_count):
+        clear()
+        print(i,': Total Length = ', cost0)
+        plot_data_anim()
+        temp = temp*alpha
+        for j in range(markov_chain_length):
+            r1, r2 = np.random.randint(0, len(all_pts), size=2)
+            tmp = all_pts[r1]
+            all_pts[r1] = all_pts[r2]
+            all_pts[r2] = tmp
+            cost1 = Coordinate.get_total_distance(all_pts)
+            if cost1 < cost0:
                 cost0 = cost1
             else:
-                tmp = all_pts[r1]
-                all_pts[r1] = all_pts[r2]
-                all_pts[r2] = tmp
-
-plot_data_final()
+                x = np.random.uniform()
+                if x < np.exp((cost0-cost1)/temp):
+                    cost0 = cost1
+                else:
+                    tmp = all_pts[r1]
+                    all_pts[r1] = all_pts[r2]
+                    all_pts[r2] = tmp
+    plot_data_final()
 #------------------------------------------------------------------------------#
+#GUI
+def main():
+    global temp
+    global markov_chain_count
+
+    sg.theme('DarkAmber')   # Add a touch of color
+    # All the stuff inside your window.
+    layout = [  [sg.Text('Please enter the required values:')],
+                [sg.Text('Iterations:', size=(15, 4)), sg.Slider(range=(50, 2000), orientation='h', size=(34, 25), default_value=1000)],
+                [sg.Text('Temperature:',size=(15, 4)), sg.Slider(range=(1, 150), orientation='h', size=(34, 25), default_value=30)],
+                [sg.Button('Ok'), sg.Button('Cancel')]]
+
+    # Create the Window
+    window = sg.Window('Annealing', layout)
+    # Event Loop to process "events" and get the "values" of the inputs
+    while True:
+        event, values = window.read()
+        if event == sg.WIN_CLOSED or event == 'Cancel': # if user closes window or clicks cancel
+            break
+        temp = values[1]
+        markov_chain_count = int(values[0])
+        window.close()
+        start_anneal()
+
+    window.close()
+
+
+#------------------------------------------------------------------------------#
+if __name__ == "__main__":
+    main()
