@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-from os import system, name
 import PySimpleGUI as sg
 
 #----------------------------Setup---------------------------------------------#
@@ -53,18 +52,6 @@ fig = plt.figure(figsize=(7,7))
 ax = fig.add_subplot()
 fig.canvas.set_window_title('Annealing')
 cost0 = 0
-
-#---------------------------------Utility--------------------------------------#
-def clear():
-
-    # for windows
-    if name == 'nt':
-        _ = system('cls')
-
-    # for mac and linux(here, os.name is 'posix')
-    else:
-        _ = system('clear')
-#------------------------------------------------------------------------------#
 
 #------------------------------Methods-----------------------------------------#
 def plot_data_anim():
@@ -139,8 +126,6 @@ def start_anneal():
         all_pts.append(Coordinate(np.random.uniform(),np.random.uniform()))
     cost0 = Coordinate.get_total_distance(all_pts)
     for i in range(markov_chain_count):
-        clear()
-        print(i,': Total Length = ', cost0)
         plot_data_anim()
         temp = temp*alpha
         for j in range(markov_chain_length):
