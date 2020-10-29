@@ -123,6 +123,8 @@ def start_anneal():
     global markov_chain_count
     global markov_chain_length
     global fig
+    global number_of_points
+
     for i in range(number_of_points): # set total numper of points
         all_pts.append(Coordinate(np.random.uniform(),np.random.uniform()))
     cost0 = Coordinate.get_total_distance(all_pts)
@@ -153,12 +155,14 @@ def start_anneal():
 def main():
     global temp
     global markov_chain_count
+    global number_of_points
 
     sg.theme('DarkAmber')   # Add a touch of color
     # All the stuff inside your window.
     layout = [  [sg.Text('Please enter the required values:')],
-                [sg.Text('Iterations:', size=(15, 4)), sg.Slider(range=(50, 2000), orientation='h', size=(34, 25), default_value=1000)],
-                [sg.Text('Temperature:',size=(15, 4)), sg.Slider(range=(1, 150), orientation='h', size=(34, 25), default_value=30)],
+                [sg.Text('Max Nodes:', size=(15, 4)), sg.Slider(range=(5, 40), orientation='h', size=(34, 25), default_value=20)], #0
+                [sg.Text('Iterations:', size=(15, 4)), sg.Slider(range=(50, 2000), orientation='h', size=(34, 25), default_value=1000)], #1
+                [sg.Text('Temperature:',size=(15, 4)), sg.Slider(range=(1, 150), orientation='h', size=(34, 25), default_value=30)], #2
                 [sg.Button('Ok'), sg.Button('Cancel')]]
 
     # Create the Window
@@ -168,8 +172,9 @@ def main():
         event, values = window.read()
         if event == sg.WIN_CLOSED or event == 'Cancel': # if user closes window or clicks cancel
             break
-        temp = values[1]
-        markov_chain_count = int(values[0])
+        number_of_points = int(values[0])
+        temp = values[2]
+        markov_chain_count = int(values[1])
         window.close()
         start_anneal()
 
